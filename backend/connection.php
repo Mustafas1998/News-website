@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 
 $host = "localhost";
 $db_user = "root";

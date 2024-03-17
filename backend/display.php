@@ -1,27 +1,36 @@
 <?php
 include("connection.php");
 
-$sql = "SELECT * FROM news";
-$result = $mysqli->query($sql);
 
-if ($result === false) {
-    echo "Error: " . $mysqli->error;
-    exit;
-}
+$query = $mysqli->prepare("SELECT * FROM news");
+$query->execute();
+$query->store_result();
+$num_rows = $query->num_rows();
 
-$news = array();
+if ($num_rows === 0) {
+    $response["status"] = "empty";
+    
 
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $news[] = $row;
+}else{
+    $array_list = [];
+    $query->bind_result($news_id,$news_title,$news_content);
+    while ($query->fetch()){
+        $array = [
+            "news_id"=> $news_id,
+            "news_title" => $news_title,
+            "news_content"=> $news_content
+        ];
+        $array_list[] = $array;
     }
+    $response["status"] = "success";
+    $response["news"] = $array_list;
+
 }
+echo json_encode($response);
 
-header('Content-Type: application/json');
-echo json_encode($news);
 
-$mysqli->close();
-?>;
+
+
 
 
 
